@@ -1010,6 +1010,11 @@ joinBtn.onclick = () => {
   myRoom = room;
   myAvatar = selectedAvatar;
 
+  // Disable button during connection
+  joinBtn.disabled = true;
+  joinBtn.querySelector('span').textContent = '⏳';
+  joinError.classList.add('hidden');
+
   SoundFX.ensure();
   haptic(10);
 
@@ -1021,11 +1026,14 @@ joinBtn.onclick = () => {
 
   // --- Access denied ---
   socket.on('access-denied', () => {
+    socket.disconnect();
     joinError.classList.remove('hidden');
     codeInput.focus();
     codeInput.select();
     haptic(15);
     setTimeout(() => joinError.classList.add('hidden'), 3000);
+    joinBtn.disabled = false;
+    joinBtn.querySelector('span').textContent = t('enter');
   });
 
   // --- Connection lifecycle ---
@@ -1055,6 +1063,13 @@ joinBtn.onclick = () => {
       gameRound = data.game.round || 0;
     }
     restoreGameState();
+    // Only switch screens on confirmed join
+    joinScreen.classList.add('hidden');
+    chatScreen.classList.remove('hidden');
+    roomNameDisplay.textContent = myRoom;
+    messageInput.focus();
+    joinBtn.disabled = false;
+    joinBtn.querySelector('span').textContent = t('enter');
   });
 
   // --- Roster: full member list with roles ---
@@ -1255,12 +1270,6 @@ joinBtn.onclick = () => {
 
   // --- Keep alive ---
   socket.on('pong', () => {});
-
-  // Switch screens
-  joinScreen.classList.add('hidden');
-  chatScreen.classList.remove('hidden');
-  roomNameDisplay.textContent = room;
-  messageInput.focus();
 };
 
 // ====== Enter key to join ======
