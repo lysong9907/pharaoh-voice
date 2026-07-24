@@ -308,7 +308,16 @@ joinBtn.onclick = () => {
       userNames.set(data.from, 'Member');
       pc = createPeerConnection(data.from, false);
     }
-    if (pc.signalingState !== 'stable') {
+    if (pc.signalingState === 'stable') {
+      // Normal: accept offer and send answer
+      await pc.setRemoteDescription(data.sdp);
+      const answer = await pc.createAnswer();
+      await pc.setLocalDescription(answer);
+      socket.emit('webrtc-answer', { target: data.from, sdp: answer });
+    } else if (pc.signalingState === 'have-local-offer') {
+      // Glare: both sides sent offers simultaneously. Roll back and accept incoming.
+      console.log('[WebRTC] Glare detected, rolling back for', data.from);
+      await pc.setLocalDescription({ type: 'rollback' });
       await pc.setRemoteDescription(data.sdp);
       const answer = await pc.createAnswer();
       await pc.setLocalDescription(answer);
@@ -479,14 +488,23 @@ micToggle.onclick = async () => {
         localStream.getAudioTracks().forEach(t => t.enabled = true);
       }
 
-      // Add tracks to all connections
-      peerConnections.forEach((pc) => {
+      // Add tracks to all connections and renegotiate
+      peerConnections.forEach((pc, userId) => {
         const senders = pc.getSenders();
         localStream.getAudioTracks().forEach(track => {
           if (senders.length === 0 || !senders.find(s => s.track === track)) {
             pc.addTrack(track, localStream);
           }
         });
+        // Renegotiate: send new offer with audio track included
+        if (pc.signalingState === 'stable') {
+          pc.createOffer()
+            .then(offer => pc.setLocalDescription(offer))
+            .then(() => {
+              socket.emit('webrtc-offer', { target: userId, sdp: pc.localDescription });
+            })
+            .catch(e => console.error('[WebRTC] Renegotiation error:', e));
+        }
       });
 
       micOn = true;
