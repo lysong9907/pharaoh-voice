@@ -1,0 +1,14 @@
+{
+  "name": "chat-room",
+  "version": "1.0.0",
+  "description": "Free voice + text chat room with WebRTC",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.22.2",
+    "socket.io": "^4.8.3"
+  }
+}
