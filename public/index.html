@@ -75,6 +75,13 @@
         <input id="room-input" type="text" maxlength="50" autocomplete="off" data-i18n-ph="roomPh" placeholder="Agree on a name with allies">
       </div>
 
+      <div class="field">
+        <label for="code-input" data-i18n="codeLabel">Access Code</label>
+        <input id="code-input" type="password" maxlength="20" autocomplete="off" data-i18n-ph="codePh" placeholder="Enter the secret code">
+      </div>
+
+      <div id="join-error" class="join-error hidden" data-i18n="wrongCode">Incorrect access code</div>
+
       <button id="join-btn" class="cta-btn" type="button">
         <span data-i18n="enter">Enter Chamber</span>
         <svg viewBox="0 0 24 24" class="cta-arrow" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
@@ -107,7 +114,7 @@
       </div>
 
       <div class="topbar-actions">
-        <button id="game-btn" class="icon-btn" type="button" data-i18n-title="gameTitle" title="Golden Mau" aria-label="Game">🐱</button>
+        <button id="game-btn" class="icon-btn game-btn-wrap" type="button" data-i18n-title="gameTitle" title="Golden Mau" aria-label="Game">🐱<span id="game-badge" class="game-badge hidden"></span></button>
         <button id="search-toggle-btn" class="icon-btn" type="button" data-i18n-title="searchTitle" title="Search" aria-label="Search messages">
           <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7" fill="none" stroke="currentColor" stroke-width="2"/><path d="m20 20-3.5-3.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
         </button>
@@ -157,6 +164,15 @@
           <div id="emoji-grid" class="emoji-grid"></div>
         </div>
 
+        <div id="sticker-picker" class="sticker-picker glass hidden">
+          <div class="picker-tabs">
+            <button class="picker-tab active" data-tab="cats" data-i18n="stickerCats">🐱 Cats</button>
+            <button class="picker-tab" data-tab="moods" data-i18n="stickerMoods">💫 Moods</button>
+            <button class="picker-tab" data-tab="egypt" data-i18n="stickerEgypt">☥ Egypt</button>
+          </div>
+          <div id="sticker-grid" class="sticker-grid"></div>
+        </div>
+
         <footer class="input-dock">
           <button id="mic-toggle" class="mic-fab mic-off" type="button" aria-label="Microphone">
             <svg class="mic-icon-on" viewBox="0 0 24 24"><path d="M12 15a3 3 0 0 0 3-3V6a3 3 0 1 0-6 0v6a3 3 0 0 0 3 3Z" fill="currentColor"/><path d="M19 10v2a7 7 0 0 1-14 0v-2M12 19v3" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
@@ -164,6 +180,7 @@
           </button>
 
           <div class="input-bar glass">
+            <button id="sticker-btn" class="icon-btn" type="button" data-i18n-title="stickerTitle" title="Stickers" aria-label="Stickers">🎭</button>
             <button id="emoji-btn" class="icon-btn" type="button" aria-label="Emoji">😊</button>
             <input id="message-input" type="text" maxlength="500" autocomplete="off" enterkeyhint="send" data-i18n-ph="msgPh" placeholder="Type a message...">
             <button id="send-btn" class="send-btn" type="button" data-i18n-title="send" title="Send" aria-label="Send">
@@ -194,7 +211,39 @@
       <div id="game-scoreboard" class="game-scoreboard"></div>
       <div id="game-arena" class="game-arena">
         <div id="game-message" class="game-message" data-i18n="gameDesc">Catch the golden cat! First to 5 wins.</div>
-        <div id="game-cat" class="game-cat hidden"></div>
+        <div id="game-cat" class="game-cat hidden">
+          <svg viewBox="0 0 80 80" class="game-cat-svg">
+            <defs>
+              <radialGradient id="catGlow" cx="50%" cy="40%"><stop offset="0%" stop-color="#ffe082"/><stop offset="100%" stop-color="#d4af37"/></radialGradient>
+            </defs>
+            <!-- Ears -->
+            <polygon points="15,22 26,4 37,20" fill="#d4af37" stroke="#b8860b" stroke-width="1.5"/>
+            <polygon points="65,22 54,4 43,20" fill="#d4af37" stroke="#b8860b" stroke-width="1.5"/>
+            <polygon points="19,21 26,10 33,20" fill="#f6d365" opacity="0.6"/>
+            <polygon points="61,21 54,10 47,20" fill="#f6d365" opacity="0.6"/>
+            <!-- Head -->
+            <ellipse cx="40" cy="38" rx="26" ry="24" fill="url(#catGlow)" stroke="#b8860b" stroke-width="2"/>
+            <!-- Eyes -->
+            <ellipse cx="30" cy="33" rx="6" ry="7" fill="#fff"/>
+            <ellipse cx="50" cy="33" rx="6" ry="7" fill="#fff"/>
+            <ellipse cx="31" cy="34" rx="3.5" ry="4.5" fill="#1a5c2a"/>
+            <ellipse cx="49" cy="34" rx="3.5" ry="4.5" fill="#1a5c2a"/>
+            <circle cx="32.5" cy="31.5" r="1.5" fill="#fff" opacity="0.8"/>
+            <circle cx="47.5" cy="31.5" r="1.5" fill="#fff" opacity="0.8"/>
+            <!-- Nose -->
+            <polygon points="38,43 42,43 40,47" fill="#e8876b"/>
+            <!-- Mouth -->
+            <path d="M40,47 Q36,54 32,53" fill="none" stroke="#8b4513" stroke-width="1.2" stroke-linecap="round"/>
+            <path d="M40,47 Q44,54 48,53" fill="none" stroke="#8b4513" stroke-width="1.2" stroke-linecap="round"/>
+            <!-- Whiskers -->
+            <line x1="18" y1="40" x2="4" y2="37" stroke="#f6d365" stroke-width="1" stroke-linecap="round" opacity="0.7"/>
+            <line x1="18" y1="44" x2="4" y2="46" stroke="#f6d365" stroke-width="1" stroke-linecap="round" opacity="0.7"/>
+            <line x1="62" y1="40" x2="76" y2="37" stroke="#f6d365" stroke-width="1" stroke-linecap="round" opacity="0.7"/>
+            <line x1="62" y1="44" x2="76" y2="46" stroke="#f6d365" stroke-width="1" stroke-linecap="round" opacity="0.7"/>
+            <!-- Crown -->
+            <path d="M30,18 L26,6 L33,12 L40,4 L47,12 L54,6 L50,18" fill="#ffdf00" stroke="#b8860b" stroke-width="1"/>
+          </svg>
+        </div>
       </div>
       <div class="game-foot">
         <button id="game-start-btn" class="cta-btn" type="button"><span data-i18n="startGame">Start Game</span></button>

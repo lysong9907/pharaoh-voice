@@ -38,7 +38,11 @@ const I18N = {
     actionDemote: 'Demote to Guest',
     promoted: '{name} is now a Vizier', demoted: '{name} is now a Guest',
     cancel: 'Cancel', roleChanged: 'Your role is now: {role}',
-    gameCat: 'Golden Mau appeared! Tap it!'
+    gameCat: 'Golden Mau appeared! Tap it!',
+    wrongCode: 'Incorrect access code',
+    codeLabel: 'Access Code', codePh: 'Enter the secret code',
+    stickerTitle: 'Stickers', stickerCats: '🐱 Cats', stickerMoods: '💫 Moods', stickerEgypt: '☥ Egypt',
+    gameInvite: 'A game of Golden Mau is on! Tap 🐱 to join'
   },
   ar: {
     brand: 'صوت الفرعون', tagline: 'غرف صوتية مشفرة نخبوية',
@@ -73,7 +77,11 @@ const I18N = {
     actionDemote: 'خفض إلى ضيف',
     promoted: '{name} أصبح وزيرًا', demoted: '{name} أصبح ضيفًا',
     cancel: 'إلغاء', roleChanged: 'دورك الحالي: {role}',
-    gameCat: 'ظهر القط الذهبي! المسه!'
+    gameCat: 'ظهر القط الذهبي! المسه!',
+    wrongCode: 'رمز الدخول غير صحيح',
+    codeLabel: 'رمز الدخول', codePh: 'أدخل الرمز السري',
+    stickerTitle: 'ملصقات', stickerCats: '🐱 قطط', stickerMoods: '💫 مشاعر', stickerEgypt: '☥ مصر',
+    gameInvite: 'لعبة القط الذهبي بدأت! اضغط 🐱 للانضمام'
   }
 };
 
@@ -124,6 +132,42 @@ const CAT_AVATARS = [
   { id:'sphinx',   name:'Sphinx',   body:'#1c120a', eye:'#ff9f0a', accent:'#d4af37', desc:'Amber eye · Watcher' },
   { id:'rose',     name:'Rose',     body:'#1a0d14', eye:'#ff6b81', accent:'#fdcb6e', desc:'Blush eye · Beloved' }
 ];
+
+// Built-in sticker packs (SVG-based, no external assets)
+const STICKER_PACKS = {
+  cats: [
+    { id:'cat-love',   emoji:'😻' },
+    { id:'cat-cool',   emoji:'😺' },
+    { id:'cat-cry',    emoji:'😿' },
+    { id:'cat-angry',  emoji:'😾' },
+    { id:'cat-wow',    emoji:'🙀' },
+    { id:'cat-heart',  emoji:'😽' },
+    { id:'cat-party',  emoji:'🎉🐱' },
+    { id:'cat-sleep',  emoji:'😴🐱' },
+  ],
+  moods: [
+    { id:'mood-love',   emoji:'💕' },
+    { id:'mood-fire',   emoji:'🔥' },
+    { id:'mood-star',   emoji:'✨' },
+    { id:'mood-crown',  emoji:'👑' },
+    { id:'mood-100',    emoji:'💯' },
+    { id:'mood-lol',    emoji:'😂' },
+    { id:'mood-wow',    emoji:'🤩' },
+    { id:'mood-ghost',  emoji:'👻' },
+  ],
+  egypt: [
+    { id:'egypt-ankh',  emoji:'☥' },
+    { id:'egypt-eye',   emoji:'🧿' },
+    { id:'egypt-cat',   emoji:'🐈' },
+    { id:'egypt-moon',  emoji:'🌙' },
+    { id:'egypt-sun',   emoji:'☀️' },
+    { id:'egypt-pyramid', emoji:'🔺' },
+    { id:'egypt-gold',  emoji:'🥇' },
+    { id:'egypt-bless', emoji:'🙏✨' },
+  ]
+};
+
+let stickerTab = 'cats';
 
 const ICE_SERVERS = [
   { urls: 'stun:stun.l.google.com:19302' },
@@ -181,7 +225,8 @@ const SoundFX = {
   leave()   { this.tone(660, 0.12, 0, 0.04); this.tone(440, 0.16, 0.1, 0.04); },
   tap()     { this.tone(880, 0.05, 0, 0.025); },
   catchEm() { this.tone(660, 0.06, 0, 0.06); this.tone(880, 0.08, 0.06, 0.05); this.tone(1100, 0.1, 0.12, 0.04); },
-  gameOver(){ this.tone(440, 0.15, 0, 0.06); this.tone(554, 0.12, 0.15, 0.05); this.tone(660, 0.2, 0.3, 0.06); }
+  gameOver(){ this.tone(440, 0.15, 0, 0.06); this.tone(554, 0.12, 0.15, 0.05); this.tone(660, 0.2, 0.3, 0.06); },
+  meow() { this.tone(580, 0.15, 0, 0.05, 'triangle'); this.tone(720, 0.12, 0.06, 0.04, 'triangle'); this.tone(520, 0.18, 0.12, 0.03, 'triangle'); }
 };
 
 // ====== State ======
@@ -251,6 +296,12 @@ const gameMessage = document.getElementById('game-message');
 const gameStartBtn = document.getElementById('game-start-btn');
 const gameEndBtn = document.getElementById('game-end-btn');
 const kickedOverlay = document.getElementById('kicked-overlay');
+const codeInput = document.getElementById('code-input');
+const joinError = document.getElementById('join-error');
+const stickerBtn = document.getElementById('sticker-btn');
+const stickerPicker = document.getElementById('sticker-picker');
+const stickerGrid = document.getElementById('sticker-grid');
+const gameBadge = document.getElementById('game-badge');
 
 // ====== Init ======
 applyLang(currentLang);
@@ -345,6 +396,55 @@ EMOJIS.forEach(emoji => {
   btn.onclick = () => { messageInput.value += emoji; messageInput.focus(); haptic(4); };
   emojiGrid.appendChild(btn);
 });
+
+// Sticker grid
+function renderStickerGrid(tab) {
+  stickerGrid.innerHTML = '';
+  const stickers = STICKER_PACKS[tab] || STICKER_PACKS.cats;
+  stickers.forEach(s => {
+    const btn = document.createElement('button');
+    btn.className = 'sticker-item';
+    btn.innerHTML = '<span class="sticker-emoji" style="font-size:38px">' + s.emoji + '</span>';
+    btn.onclick = () => {
+      sendSticker(s.emoji);
+      stickerPicker.classList.add('hidden');
+      haptic(8);
+    };
+    stickerGrid.appendChild(btn);
+  });
+}
+renderStickerGrid(stickerTab);
+
+// Sticker tab switches
+document.querySelectorAll('.picker-tab').forEach(tab => {
+  tab.onclick = () => {
+    document.querySelectorAll('.picker-tab').forEach(t => t.classList.remove('active'));
+    tab.classList.add('active');
+    stickerTab = tab.dataset.tab;
+    renderStickerGrid(stickerTab);
+    haptic(4);
+  };
+});
+
+// Sticker button
+stickerBtn.onclick = (e) => {
+  e.stopPropagation();
+  stickerPicker.classList.toggle('hidden');
+  emojiPicker.classList.add('hidden');
+  haptic(5);
+};
+document.addEventListener('click', (e) => {
+  if (!stickerPicker.contains(e.target) && e.target !== stickerBtn && !stickerBtn.contains(e.target)) {
+    stickerPicker.classList.add('hidden');
+  }
+});
+
+function sendSticker(emoji) {
+  if (!socket || !socket.connected) return;
+  socket.emit('chat-message', { message: '', emoji: emoji });
+  SoundFX.send();
+  haptic(6);
+}
 
 // Language controls
 document.querySelectorAll('.lang-btn').forEach(btn => { btn.onclick = () => applyLang(btn.dataset.lang); });
@@ -546,10 +646,19 @@ function addChatMessage(id, name, avatarId, text, emoji, isSelf, timestamp) {
   }
 
   const bubble = document.createElement('div');
-  bubble.className = 'bubble';
+  const isSticker = emoji && !text;
+  bubble.className = 'bubble' + (isSticker ? ' sticker-bubble' : '');
   const textEl = document.createElement('div');
   textEl.className = 'text';
-  if (emoji && !text) { textEl.classList.add('emoji-only'); textEl.textContent = emoji; }
+  if (isSticker) {
+    textEl.classList.add('emoji-only');
+    if (emoji.length <= 6) {
+      // Large emoji sticker
+      textEl.innerHTML = '<span class="sticker-emoji">' + escapeHtml(emoji) + '</span>';
+    } else {
+      textEl.textContent = emoji;
+    }
+  }
   else { textEl.textContent = text; if (emoji) textEl.textContent += ' ' + emoji; }
   bubble.appendChild(textEl);
   content.appendChild(bubble);
@@ -808,7 +917,7 @@ function renderGameScoreboard() {
   }).join('');
 }
 
-function openGame() { gamePanel.classList.remove('hidden'); }
+function openGame() { gamePanel.classList.remove('hidden'); gameBadge.classList.add('hidden'); }
 function closeGame() { gamePanel.classList.add('hidden'); }
 gameBtn.onclick = () => { openGame(); haptic(5); };
 gameCloseBtn.onclick = closeGame;
@@ -845,6 +954,7 @@ gameCat.onclick = () => {
   gamePhase = 'resolved';
   haptic(20);
   SoundFX.catchEm();
+  SoundFX.meow();
 };
 
 function handleGameResult(data) {
@@ -895,6 +1005,7 @@ function restoreGameState() {
 joinBtn.onclick = () => {
   const name = nameInput.value.trim() || nameInput.placeholder || ('Pharaoh' + Math.floor(Math.random() * 1000));
   const room = roomInput.value.trim() || 'pyramid';
+  const code = codeInput.value.trim();
   myName = name;
   myRoom = room;
   myAvatar = selectedAvatar;
@@ -908,17 +1019,26 @@ joinBtn.onclick = () => {
     timeout: 20000, transports: ['websocket', 'polling']
   });
 
+  // --- Access denied ---
+  socket.on('access-denied', () => {
+    joinError.classList.remove('hidden');
+    codeInput.focus();
+    codeInput.select();
+    haptic(15);
+    setTimeout(() => joinError.classList.add('hidden'), 3000);
+  });
+
   // --- Connection lifecycle ---
   socket.on('connect', () => {
     setConnStatus('stable');
-    socket.emit('join-room', { name, room, avatar: myAvatar });
+    socket.emit('join-room', { name, room, avatar: myAvatar, code });
   });
   socket.on('connect_error', () => setConnStatus('reconnecting'));
   socket.on('disconnect', () => setConnStatus('reconnecting'));
   socket.on('reconnect', () => {
     setConnStatus('stable');
     showToast(t('connRestored'), true);
-    socket.emit('join-room', { name: myName, room: myRoom, avatar: myAvatar });
+    socket.emit('join-room', { name: myName, room: myRoom, avatar: myAvatar, code: codeInput.value.trim() });
     userNames.forEach((_, userId) => {
       if (!peerConnections.has(userId)) createPeerConnection(userId, true);
     });
@@ -1086,7 +1206,10 @@ joinBtn.onclick = () => {
     gameStartBtn.classList.add('hidden');
     gameEndBtn.classList.remove('hidden');
     renderGameScoreboard();
-    openGame();
+    // Show badge notification instead of force-opening panel
+    gameBadge.textContent = '!';
+    gameBadge.classList.remove('hidden');
+    showToast(t('gameInvite'), true);
     SoundFX.tap();
   });
 
@@ -1114,6 +1237,7 @@ joinBtn.onclick = () => {
 
   socket.on('game-over', (data) => {
     handleGameOver(data);
+    gameBadge.classList.add('hidden');
   });
 
   socket.on('game-ended', (data) => {
@@ -1126,6 +1250,7 @@ joinBtn.onclick = () => {
     renderGameScoreboard();
     gameStartBtn.classList.remove('hidden');
     gameEndBtn.classList.add('hidden');
+    gameBadge.classList.add('hidden');
   });
 
   // --- Keep alive ---

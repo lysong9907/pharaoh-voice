@@ -181,6 +181,14 @@ input { font-family: inherit; color: inherit; }
 
 .join-hint { margin-top: 16px; font-size: 12px; color: var(--text-faint); text-align: center; }
 
+.join-error {
+  width: 100%; padding: 10px 14px; margin-bottom: 4px; border-radius: var(--radius-md);
+  font-size: 13px; font-weight: 600; color: var(--danger); text-align: center;
+  background: rgba(240, 86, 79, 0.1); border: 1px solid rgba(240, 86, 79, 0.3);
+  animation: shake .4s ease;
+}
+@keyframes shake { 0%,100% { transform: translateX(0); } 20%,60% { transform: translateX(-6px); } 40%,80% { transform: translateX(6px); } }
+
 .feature-pills { display: flex; gap: 8px; margin-top: 18px; }
 .pill {
   display: inline-flex; align-items: center; gap: 6px; padding: 7px 14px;
@@ -578,15 +586,15 @@ input { font-family: inherit; color: inherit; }
 .game-message.winner { font-size: 18px; color: var(--gold-light); flex-direction: column; gap: 6px; }
 .trophy { font-size: 36px; display: block; }
 .game-cat {
-  position: absolute; width: 60px; height: 60px; border-radius: 50%;
-  background: linear-gradient(135deg, var(--gold-light), var(--gold) 50%, var(--gold-deep));
-  box-shadow: 0 0 24px rgba(212,175,55,.6), 0 0 60px rgba(246,211,101,.3), inset 0 1px 0 rgba(255,255,255,.4);
-  cursor: pointer; transform: translate(-50%, -50%); display: flex; align-items: center; justify-content: center;
-  font-size: 28px; animation: catPop .35s var(--spring);
+  position: absolute; width: 72px; height: 72px;
+  cursor: pointer; transform: translate(-50%, -50%);
+  animation: catPop .35s var(--spring);
   transition: transform .12s var(--ease);
+  filter: drop-shadow(0 0 14px rgba(212,175,55,.7)) drop-shadow(0 0 36px rgba(246,211,101,.4));
 }
-.game-cat:active { transform: translate(-50%, -50%) scale(1.15); }
+.game-cat:active { transform: translate(-50%, -50%) scale(1.2); }
 @keyframes catPop { from { transform: translate(-50%, -50%) scale(0); opacity: 0; } to { transform: translate(-50%, -50%) scale(1); opacity: 1; } }
+.game-cat-svg { width: 72px; height: 72px; display: block; }
 .game-foot { display: flex; gap: 8px; }
 .game-foot .cta-btn { margin-top: 0; padding: 12px; font-size: 14px; }
 .ghost-btn {
@@ -595,6 +603,18 @@ input { font-family: inherit; color: inherit; }
   transition: all .2s var(--ease);
 }
 .ghost-btn:hover { background: rgba(255,255,255,.08); color: var(--text-primary); }
+
+/* ============ Game Notification Badge ============ */
+.game-btn-wrap { position: relative; }
+.game-badge {
+  position: absolute; top: -4px; right: -4px; width: 18px; height: 18px;
+  border-radius: 50%; background: var(--danger);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 10px; font-weight: 700; color: #fff;
+  animation: badgePulse 1.5s ease-in-out infinite;
+  box-shadow: 0 0 8px rgba(240,86,79,.5);
+}
+@keyframes badgePulse { 0%,100% { transform: scale(1); } 50% { transform: scale(1.25); } }
 
 /* ============ Kicked Overlay ============ */
 .kicked-overlay {
@@ -609,6 +629,43 @@ input { font-family: inherit; color: inherit; }
 .kicked-card h2 { font-size: 18px; color: var(--gold-light); font-family: "Cinzel", serif; }
 .kicked-card p { font-size: 14px; color: var(--text-secondary); }
 .kicked-card .cta-btn { width: auto; padding: 13px 32px; }
+
+/* ============ Sticker Picker ============ */
+.sticker-picker {
+  position: absolute; bottom: 86px; inset-inline-start: 8px; inset-inline-end: 8px;
+  padding: 12px; z-index: 30; border-radius: var(--radius-lg);
+  animation: popIn .25s var(--spring);
+}
+@media (min-width: 768px) { .sticker-picker { inset-inline-end: auto; width: 340px; } }
+.picker-tabs { display: flex; gap: 4px; margin-bottom: 10px; }
+.picker-tab {
+  flex: 1; padding: 8px 6px; font-size: 12px; font-weight: 600; border-radius: 10px;
+  color: var(--text-secondary); background: rgba(255,255,255,.04); border: 1px solid transparent;
+  transition: all .2s; cursor: pointer;
+}
+.picker-tab:hover { background: rgba(255,255,255,.08); }
+.picker-tab.active { color: var(--gold-light); background: rgba(212,175,55,.12); border-color: var(--gold-border); }
+.sticker-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; max-height: 220px; overflow-y: auto; }
+.sticker-item {
+  aspect-ratio: 1; display: flex; align-items: center; justify-content: center;
+  border-radius: 14px; padding: 6px; cursor: pointer;
+  background: rgba(255,255,255,.04); border: 1px solid transparent;
+  transition: all .2s var(--ease);
+}
+.sticker-item:hover { background: rgba(255,255,255,.1); border-color: var(--gold-border); transform: scale(1.08); }
+.sticker-item:active { transform: scale(.92); }
+.sticker-item svg { width: 100%; height: 100%; }
+
+/* Sticker message bubble */
+.message .bubble.sticker-bubble {
+  background: transparent !important; border: none !important; box-shadow: none !important;
+  padding: 4px !important; -webkit-backdrop-filter: none; backdrop-filter: none;
+}
+.message.self .bubble.sticker-bubble {
+  background: transparent !important; color: inherit;
+}
+.sticker-bubble svg, .sticker-bubble .sticker-large { width: 100px; height: 100px; display: block; }
+.sticker-bubble .sticker-emoji { font-size: 64px; line-height: 1; display: block; text-align: center; }
 
 /* ============ Reduced Motion ============ */
 @media (prefers-reduced-motion: reduce) {

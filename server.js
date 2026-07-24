@@ -33,6 +33,7 @@ const rooms = new Map();
 const games = new Map();
 
 const VALID_AVATARS = ['bastet','mau','nefertiti','cleocatra','luna','isis','sphinx','rose'];
+const ACCESS_CODE = '20260720';
 function cleanAvatar(a) {
   return VALID_AVATARS.includes(a) ? a : VALID_AVATARS[Math.floor(Math.random() * VALID_AVATARS.length)];
 }
@@ -138,6 +139,12 @@ io.on('connection', (socket) => {
 
   // --- Join room ---
   socket.on('join-room', (data) => {
+    // Access code check
+    if (String(data.code || '') !== ACCESS_CODE) {
+      socket.emit('access-denied');
+      return;
+    }
+
     const roomName = sanitize(data.room || 'pyramid').slice(0, 50);
     const name = sanitize(data.name || 'Pharaoh').slice(0, 20);
     const avatar = cleanAvatar(data.avatar);
