@@ -58,6 +58,11 @@
       </div>
 
       <div class="field">
+        <label data-i18n="avatarLabel">Choose your cat</label>
+        <div id="avatar-row" class="avatar-row" role="listbox" aria-label="Avatar"></div>
+      </div>
+
+      <div class="field">
         <label for="name-input" data-i18n="nameLabel">Your Name</label>
         <div class="field-row">
           <input id="name-input" type="text" maxlength="20" autocomplete="off" data-i18n-ph="namePh" placeholder="Enter your name">
@@ -80,7 +85,7 @@
       <div class="feature-pills">
         <span class="pill"><i>🎙</i><b data-i18n="featVoice">Voice</b></span>
         <span class="pill"><i>💬</i><b data-i18n="featText">Text</b></span>
-        <span class="pill"><i>✨</i><b data-i18n="featEmoji">Emoji</b></span>
+        <span class="pill"><i>🐱</i><b data-i18n="featGame">Game</b></span>
       </div>
     </div>
   </div>
@@ -102,6 +107,10 @@
       </div>
 
       <div class="topbar-actions">
+        <button id="game-btn" class="icon-btn" type="button" data-i18n-title="gameTitle" title="Golden Mau" aria-label="Game">🐱</button>
+        <button id="search-toggle-btn" class="icon-btn" type="button" data-i18n-title="searchTitle" title="Search" aria-label="Search messages">
+          <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7" fill="none" stroke="currentColor" stroke-width="2"/><path d="m20 20-3.5-3.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        </button>
         <button id="sound-toggle" class="icon-btn" type="button" title="Sounds" aria-label="Toggle sounds">🔊</button>
         <button id="lang-toggle" class="icon-btn lang-mini" type="button" title="Language">ع</button>
         <button id="copy-link-btn" class="icon-btn" type="button" data-i18n-title="copyLink" title="Copy invite link" aria-label="Copy invite link">
@@ -114,7 +123,6 @@
     </header>
 
     <div class="chat-body">
-      <!-- Participants: sidebar on desktop, drawer on mobile -->
       <div id="drawer-backdrop" class="drawer-backdrop hidden"></div>
       <aside id="participants-panel" class="participants glass">
         <div class="panel-head">
@@ -124,8 +132,15 @@
         <ul id="participants-list" class="participants-list"></ul>
       </aside>
 
-      <!-- Main chat column -->
       <main class="chat-main">
+        <!-- Search bar -->
+        <div id="search-bar" class="search-bar glass hidden">
+          <svg viewBox="0 0 24 24" class="search-icon"><circle cx="11" cy="11" r="7" fill="none" stroke="currentColor" stroke-width="2"/><path d="m20 20-3.5-3.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+          <input id="search-input" type="text" autocomplete="off" data-i18n-ph="searchPh" placeholder="Search messages...">
+          <button id="clear-chat-btn" class="icon-btn" type="button" data-i18n-title="clearChat" title="Clear chat" aria-label="Clear chat">🗑</button>
+          <button id="search-close-btn" class="icon-btn" type="button" aria-label="Close search">✕</button>
+        </div>
+
         <div id="chat-messages" class="chat-messages">
           <div id="empty-state" class="empty-state">
             <span class="empty-ankh">☥</span>
@@ -157,6 +172,44 @@
           </div>
         </footer>
       </main>
+    </div>
+  </div>
+
+  <!-- ===== Action Sheet (moderation) ===== -->
+  <div id="action-sheet" class="sheet-backdrop hidden">
+    <div class="action-sheet glass" role="dialog" aria-modal="true">
+      <div id="action-target" class="action-target"></div>
+      <div id="action-buttons" class="action-buttons"></div>
+      <button id="action-cancel" class="action-cancel" type="button" data-i18n="cancel">Cancel</button>
+    </div>
+  </div>
+
+  <!-- ===== Golden Mau Game ===== -->
+  <div id="game-panel" class="sheet-backdrop hidden">
+    <div class="game-card glass" role="dialog" aria-modal="true">
+      <div class="game-head">
+        <span class="game-title">🐱 <b data-i18n="gameTitle">Golden Mau</b></span>
+        <button id="game-close-btn" class="icon-btn" type="button" aria-label="Close game">✕</button>
+      </div>
+      <div id="game-scoreboard" class="game-scoreboard"></div>
+      <div id="game-arena" class="game-arena">
+        <div id="game-message" class="game-message" data-i18n="gameDesc">Catch the golden cat! First to 5 wins.</div>
+        <div id="game-cat" class="game-cat hidden"></div>
+      </div>
+      <div class="game-foot">
+        <button id="game-start-btn" class="cta-btn" type="button"><span data-i18n="startGame">Start Game</span></button>
+        <button id="game-end-btn" class="ghost-btn hidden" type="button"><span data-i18n="endGame">End Game</span></button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== Kicked Overlay ===== -->
+  <div id="kicked-overlay" class="kicked-overlay hidden">
+    <div class="kicked-card glass">
+      <div class="kicked-icon">🚪</div>
+      <h2 data-i18n="kickedTitle">Removed from chamber</h2>
+      <p data-i18n="kickedBody">The Pharaoh has asked you to leave.</p>
+      <button class="cta-btn" type="button" onclick="location.reload()"><span data-i18n="rejoin">Return to Entrance</span></button>
     </div>
   </div>
 
