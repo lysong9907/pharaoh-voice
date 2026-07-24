@@ -917,7 +917,7 @@ function renderGameScoreboard() {
   }).join('');
 }
 
-function openGame() { gamePanel.classList.remove('hidden'); gameBadge.classList.add('hidden'); }
+function openGame() { gamePanel.classList.remove('hidden'); gameBadge.classList.add('hidden'); gameBtn.classList.remove('game-active'); }
 function closeGame() { gamePanel.classList.add('hidden'); }
 gameBtn.onclick = () => { openGame(); haptic(5); };
 gameCloseBtn.onclick = closeGame;
@@ -1221,10 +1221,12 @@ joinBtn.onclick = () => {
     gameStartBtn.classList.add('hidden');
     gameEndBtn.classList.remove('hidden');
     renderGameScoreboard();
-    // Show badge notification instead of force-opening panel
+    // Multi-channel notification
     gameBadge.textContent = '!';
     gameBadge.classList.remove('hidden');
+    gameBtn.classList.add('game-active');
     showToast(t('gameInvite'), true);
+    addSystemMessage('🐱 ' + t('gameStarted') + ' — ' + t('gameInvite'));
     SoundFX.tap();
   });
 
@@ -1244,15 +1246,20 @@ joinBtn.onclick = () => {
 
   socket.on('game-result', (data) => {
     handleGameResult(data);
+    // Chat announcement
+    addSystemMessage('🐱 ' + data.winnerName + ' ' + t('gameCatch') + ' · Round ' + data.round);
   });
 
   socket.on('game-escape', (data) => {
     handleGameEscape(data);
+    addSystemMessage('💨 ' + t('gameEscaped') + ' · Round ' + data.round);
   });
 
   socket.on('game-over', (data) => {
     handleGameOver(data);
     gameBadge.classList.add('hidden');
+    gameBtn.classList.remove('game-active');
+    addSystemMessage('🏆 ' + t('gameOver', { name: data.championName }));
   });
 
   socket.on('game-ended', (data) => {
@@ -1266,6 +1273,8 @@ joinBtn.onclick = () => {
     gameStartBtn.classList.remove('hidden');
     gameEndBtn.classList.add('hidden');
     gameBadge.classList.add('hidden');
+    gameBtn.classList.remove('game-active');
+    addSystemMessage('🎮 Golden Mau ended' + (data.reason === 'stopped' ? ' by host.' : '.'));
   });
 
   // --- Keep alive ---

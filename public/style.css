@@ -616,6 +616,18 @@ input { font-family: inherit; color: inherit; }
 }
 @keyframes badgePulse { 0%,100% { transform: scale(1); } 50% { transform: scale(1.25); } }
 
+/* Game button bounces when game is on */
+.game-active {
+  animation: gameBtnBounce .6s ease-in-out infinite;
+  border-color: var(--gold-border) !important;
+  box-shadow: 0 0 14px rgba(212,175,55,.4) !important;
+}
+@keyframes gameBtnBounce {
+  0%,100% { transform: translateY(0); }
+  25% { transform: translateY(-3px); }
+  75% { transform: translateY(-1px); }
+}
+
 /* ============ Kicked Overlay ============ */
 .kicked-overlay {
   position: fixed; inset: 0; z-index: 80;
