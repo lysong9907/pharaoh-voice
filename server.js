@@ -124,6 +124,18 @@ io.on('connection', (socket) => {
     }
   });
 
+  // --- Typing indicator (transient relay) ---
+  socket.on('typing', () => {
+    if (!currentRoom) return;
+    socket.to(currentRoom).emit('user-typing', { id: socket.id, name: userName });
+  });
+
+  // --- Speaking state (transient relay, not persisted) ---
+  socket.on('speaking', (data) => {
+    if (!currentRoom) return;
+    socket.to(currentRoom).emit('user-speaking', { id: socket.id, speaking: !!(data && data.speaking) });
+  });
+
   // --- Text chat ---
   socket.on('chat-message', (data) => {
     if (!currentRoom) return;

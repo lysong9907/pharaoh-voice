@@ -1,147 +1,168 @@
 <!DOCTYPE html>
-<html lang="en" dir="ltr">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Pharaoh Voice — Elite Chat</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#0a0e1a">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>Pharaoh Voice</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Inter:wght@300;400;500;600;700&family=Noto+Kufi+Arabic:wght@400;500;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=Inter:wght@400;500;600;700&family=Noto+Kufi+Arabic:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
+  <script src="/socket.io/socket.io.js"></script>
 </head>
 <body>
 
-  <!-- ====== Background ambient ====== -->
-  <div class="bg-ambient">
-    <div class="bg-pyramid pyramid-1"></div>
-    <div class="bg-pyramid pyramid-2"></div>
-    <div class="bg-pyramid pyramid-3"></div>
-    <div class="bg-stars"></div>
-    <div class="bg-glow"></div>
+  <!-- ===== Ambient Background ===== -->
+  <div class="bg-scene" aria-hidden="true">
+    <div class="bg-sun"></div>
+    <div class="bg-stars">
+      <span class="star s1"></span><span class="star s2"></span><span class="star s3"></span>
+      <span class="star s4"></span><span class="star s5"></span><span class="star s6"></span>
+      <span class="star s7"></span><span class="star s8"></span><span class="star s9"></span>
+    </div>
+    <svg class="bg-pyramids" viewBox="0 0 1440 320" preserveAspectRatio="none">
+      <path d="M-40 320 L220 110 L480 320 Z" fill="rgba(212,175,55,0.045)"/>
+      <path d="M340 320 L700 40 L1060 320 Z" fill="rgba(212,175,55,0.07)"/>
+      <path d="M920 320 L1200 130 L1480 320 Z" fill="rgba(212,175,55,0.05)"/>
+    </svg>
+    <div class="bg-vignette"></div>
   </div>
 
-  <!-- ====== Language Switcher ====== -->
-  <div class="lang-switcher">
-    <button class="lang-btn" data-lang="en" title="English">EN</button>
-    <button class="lang-btn" data-lang="ar" title="العربية">ع</button>
-  </div>
-
-  <!-- ====== Join Screen ====== -->
+  <!-- ===== Join Screen ===== -->
   <div id="join-screen" class="screen">
-    <div class="join-card glass-gold">
-      <!-- Eye of Horus Logo -->
-      <div class="logo-wrap">
-        <svg class="logo-horus" viewBox="0 0 120 80" fill="none">
-          <!-- Stylized Eye of Horus (Wadjet) -->
-          <path d="M10 40 C 25 20, 50 15, 70 15 C 90 15, 105 25, 110 40 C 105 55, 90 65, 70 65 C 50 65, 25 60, 10 40 Z" stroke="url(#goldGrad)" stroke-width="2.5" fill="rgba(212,175,55,0.06)"/>
-          <circle cx="60" cy="40" r="14" stroke="url(#goldGrad)" stroke-width="2.5" fill="rgba(30,58,138,0.4)"/>
-          <circle cx="60" cy="40" r="6" fill="url(#goldGrad)"/>
-          <!-- Hieroglyphic markings -->
-          <path d="M60 65 L 60 72" stroke="url(#goldGrad)" stroke-width="2.5" stroke-linecap="round"/>
-          <path d="M55 70 Q 60 76, 65 70" stroke="url(#goldGrad)" stroke-width="2.5" fill="none" stroke-linecap="round"/>
-          <path d="M95 28 L 105 22" stroke="url(#goldGrad)" stroke-width="2.5" stroke-linecap="round"/>
+    <div class="join-card glass">
+      <div class="join-logo">
+        <svg viewBox="0 0 96 56" class="horus-eye" aria-hidden="true">
           <defs>
-            <linearGradient id="goldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" style="stop-color:#f0c75e"/>
-              <stop offset="50%" style="stop-color:#d4af37"/>
-              <stop offset="100%" style="stop-color:#b8860b"/>
+            <linearGradient id="goldGrad" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0" stop-color="#f6d365"/>
+              <stop offset="1" stop-color="#d4af37"/>
             </linearGradient>
           </defs>
+          <path d="M8 12 Q48 -6 88 12" fill="none" stroke="url(#goldGrad)" stroke-width="3" stroke-linecap="round"/>
+          <path d="M10 20 Q48 40 86 20 Q48 2 10 20 Z" fill="none" stroke="url(#goldGrad)" stroke-width="2.5"/>
+          <circle cx="48" cy="20" r="7" fill="url(#goldGrad)"/>
+          <path d="M38 30 L34 48" stroke="url(#goldGrad)" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+          <path d="M58 30 Q70 34 72 46" stroke="url(#goldGrad)" stroke-width="2.5" stroke-linecap="round" fill="none"/>
         </svg>
       </div>
+      <h1 class="join-brand" data-i18n="brand">PHARAOH VOICE</h1>
+      <p class="join-tagline" data-i18n="tagline">Elite Encrypted Voice Chambers</p>
 
-      <h1 class="brand-title" data-i18n="brand">PHARAOH VOICE</h1>
-      <p class="brand-subtitle" data-i18n="tagline">Elite Encrypted Voice Chambers</p>
-
-      <div class="input-group">
-        <label class="input-label" data-i18n="nameLabel">Your Name</label>
-        <input type="text" id="name-input" data-i18n-ph="namePh" maxlength="20" autocomplete="off">
-      </div>
-      <div class="input-group">
-        <label class="input-label" data-i18n="roomLabel">Chamber Name</label>
-        <input type="text" id="room-input" data-i18n-ph="roomPh" maxlength="50" autocomplete="off">
+      <div class="lang-segment" role="group" aria-label="Language">
+        <button class="lang-btn active" data-lang="en">EN</button>
+        <button class="lang-btn" data-lang="ar">عربي</button>
       </div>
 
-      <button id="join-btn" class="btn-enter">
+      <div class="field">
+        <label for="name-input" data-i18n="nameLabel">Your Name</label>
+        <div class="field-row">
+          <input id="name-input" type="text" maxlength="20" autocomplete="off" data-i18n-ph="namePh" placeholder="Enter your name">
+          <button id="dice-btn" class="icon-btn" type="button" title="Random name" data-i18n-title="randomName">🎲</button>
+        </div>
+      </div>
+
+      <div class="field">
+        <label for="room-input" data-i18n="roomLabel">Chamber Name</label>
+        <input id="room-input" type="text" maxlength="50" autocomplete="off" data-i18n-ph="roomPh" placeholder="Agree on a name with allies">
+      </div>
+
+      <button id="join-btn" class="cta-btn" type="button">
         <span data-i18n="enter">Enter Chamber</span>
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        <svg viewBox="0 0 24 24" class="cta-arrow" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </button>
 
-      <p class="hint-text" data-i18n="hint">Share the chamber link with allies to connect</p>
+      <p class="join-hint" data-i18n="hint">Share the chamber link with allies to connect</p>
 
-      <div class="features-row">
-        <div class="feature-chip"><span>🎙</span><span data-i18n="featVoice">Voice</span></div>
-        <div class="feature-chip"><span>💬</span><span data-i18n="featText">Text</span></div>
-        <div class="feature-chip"><span>😀</span><span data-i18n="featEmoji">Emoji</span></div>
+      <div class="feature-pills">
+        <span class="pill"><i>🎙</i><b data-i18n="featVoice">Voice</b></span>
+        <span class="pill"><i>💬</i><b data-i18n="featText">Text</b></span>
+        <span class="pill"><i>✨</i><b data-i18n="featEmoji">Emoji</b></span>
       </div>
     </div>
   </div>
 
-  <!-- ====== Chat Room Screen ====== -->
+  <!-- ===== Chat Screen ===== -->
   <div id="chat-screen" class="screen hidden">
-    <!-- Top bar -->
-    <div class="topbar glass-dark">
-      <div class="room-info">
-        <span class="ankh-icon">☥</span>
-        <span id="room-name-display" class="room-name"></span>
-        <span class="user-count" id="user-count">1</span>
-      </div>
-      <div class="topbar-actions">
-        <button id="copy-link-btn" class="btn-icon" data-i18n-title="copyLink">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
-        </button>
-        <button id="leave-btn" class="btn-icon btn-leave" data-i18n-title="leave">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
-        </button>
-      </div>
-    </div>
 
-    <!-- Connection status indicator -->
-    <div id="conn-status" class="conn-status conn-stable">
-      <span class="conn-dot"></span>
-      <span class="conn-text" data-i18n="connStable">Connected</span>
-    </div>
-
-    <!-- Main area -->
-    <div class="main-area">
-      <!-- Participants panel -->
-      <div class="participants-panel glass-dark">
-        <h3 class="panel-title" data-i18n="participants">Members</h3>
-        <div id="participants-list"></div>
-      </div>
-
-      <!-- Chat panel -->
-      <div class="chat-panel">
-        <div id="chat-messages" class="chat-messages"></div>
-
-        <!-- Emoji picker -->
-        <div id="emoji-picker" class="emoji-picker glass-dark hidden">
-          <div class="emoji-grid" id="emoji-grid"></div>
-        </div>
-
-        <!-- Input area -->
-        <div class="chat-input-area glass-dark">
-          <button id="emoji-btn" class="btn-icon" data-i18n-title="emoji">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg>
-          </button>
-          <input type="text" id="message-input" data-i18n-ph="msgPh" maxlength="500" autocomplete="off">
-          <button id="send-btn" class="btn-send" data-i18n-title="send">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
-          </button>
-        </div>
-      </div>
-    </div>
-
-    <!-- Bottom: mic control -->
-    <div class="bottom-bar glass-dark">
-      <button id="mic-toggle" class="mic-btn mic-off">
-        <svg class="mic-icon" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
-        <span class="mic-label" data-i18n="micOn">Unmute</span>
+    <header class="topbar glass-bar">
+      <button id="menu-btn" class="icon-btn topbar-menu" type="button" title="Members" aria-label="Members">
+        <svg viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
       </button>
+
+      <div class="topbar-room">
+        <span class="ankh">☥</span>
+        <span id="room-name-display">pyramid</span>
+        <span id="conn-status" class="conn-dot conn-stable" role="status">
+          <span class="conn-text" data-i18n="connStable">Connected</span>
+        </span>
+      </div>
+
+      <div class="topbar-actions">
+        <button id="sound-toggle" class="icon-btn" type="button" title="Sounds" aria-label="Toggle sounds">🔊</button>
+        <button id="lang-toggle" class="icon-btn lang-mini" type="button" title="Language">ع</button>
+        <button id="copy-link-btn" class="icon-btn" type="button" data-i18n-title="copyLink" title="Copy invite link" aria-label="Copy invite link">
+          <svg viewBox="0 0 24 24"><path d="M10 14a5 5 0 0 0 7.07 0l3-3a5 5 0 0 0-7.07-7.07l-1.5 1.5M14 10a5 5 0 0 0-7.07 0l-3 3a5 5 0 0 0 7.07 7.07l1.5-1.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        </button>
+        <button id="leave-btn" class="icon-btn danger" type="button" data-i18n-title="leave" title="Leave chamber" aria-label="Leave chamber">
+          <svg viewBox="0 0 24 24"><path d="M9 21H6a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h3M16 17l5-5-5-5M21 12H9" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+      </div>
+    </header>
+
+    <div class="chat-body">
+      <!-- Participants: sidebar on desktop, drawer on mobile -->
+      <div id="drawer-backdrop" class="drawer-backdrop hidden"></div>
+      <aside id="participants-panel" class="participants glass">
+        <div class="panel-head">
+          <h2 data-i18n="participants">Members</h2>
+          <span id="user-count" class="count-badge">1</span>
+        </div>
+        <ul id="participants-list" class="participants-list"></ul>
+      </aside>
+
+      <!-- Main chat column -->
+      <main class="chat-main">
+        <div id="chat-messages" class="chat-messages">
+          <div id="empty-state" class="empty-state">
+            <span class="empty-ankh">☥</span>
+            <p data-i18n="emptyState">The chamber is silent. Send the first message.</p>
+          </div>
+        </div>
+
+        <div id="typing-indicator" class="typing-indicator hidden">
+          <span class="typing-dots"><i></i><i></i><i></i></span>
+          <span id="typing-text"></span>
+        </div>
+
+        <div id="emoji-picker" class="emoji-picker glass hidden">
+          <div id="emoji-grid" class="emoji-grid"></div>
+        </div>
+
+        <footer class="input-dock">
+          <button id="mic-toggle" class="mic-fab mic-off" type="button" aria-label="Microphone">
+            <svg class="mic-icon-on" viewBox="0 0 24 24"><path d="M12 15a3 3 0 0 0 3-3V6a3 3 0 1 0-6 0v6a3 3 0 0 0 3 3Z" fill="currentColor"/><path d="M19 10v2a7 7 0 0 1-14 0v-2M12 19v3" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+            <svg class="mic-icon-off" viewBox="0 0 24 24"><path d="M12 15a3 3 0 0 0 3-3V6a3 3 0 1 0-6 0v6a3 3 0 0 0 3 3Z" fill="currentColor"/><path d="M19 10v2a7 7 0 0 1-14 0v-2M12 19v3M4 4l16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+          </button>
+
+          <div class="input-bar glass">
+            <button id="emoji-btn" class="icon-btn" type="button" aria-label="Emoji">😊</button>
+            <input id="message-input" type="text" maxlength="500" autocomplete="off" enterkeyhint="send" data-i18n-ph="msgPh" placeholder="Type a message...">
+            <button id="send-btn" class="send-btn" type="button" data-i18n-title="send" title="Send" aria-label="Send">
+              <svg viewBox="0 0 24 24"><path d="M22 2 11 13M22 2l-7 20-4-9-9-4 20-7Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </button>
+          </div>
+        </footer>
+      </main>
     </div>
   </div>
 
-  <script src="/socket.io/socket.io.js"></script>
+  <!-- ===== Toasts ===== -->
+  <div id="toast-container" class="toast-container" aria-live="polite"></div>
+
   <script src="app.js"></script>
 </body>
 </html>
